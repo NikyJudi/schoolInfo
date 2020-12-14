@@ -1,8 +1,11 @@
 package com.learn.service.impl;
 
+import com.learn.entity.StEntity;
+import com.learn.entity.SysUserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -47,12 +50,25 @@ public class GykqServiceImpl implements GykqService {
 
     @Override
     public List<GykqEntity> queryList(Map<String, Object> map) {
-        List<GykqEntity> list = gykqDao.queryList(map);
-        for (GykqEntity entity : list) {
-
-            if (entity.getSysUser() != null && this.sysUserService.queryObject(entity.getSysUser()) != null)
-                entity.setSysUserEntity(this.sysUserService.queryObject(entity.getSysUser()));
-
+        List<GykqEntity> list = new ArrayList<>();
+        String name = (String) map.get("name");
+        if (name == null || name.equals("") || name.trim().equals("")) {
+            list = gykqDao.queryList(map);
+            for (GykqEntity entity : list) {
+                if (entity.getSysUser() != null && this.sysUserService.queryObject(entity.getSysUser()) != null)
+                    entity.setSysUserEntity(this.sysUserService.queryObject(entity.getSysUser()));
+            }
+        } else {
+            name = name.trim();
+            List<SysUserEntity> userList = sysUserService.queryByName(name);
+            for (SysUserEntity user: userList){
+                Long userId = user.getUserId();
+                List<GykqEntity> gykqEntities = gykqDao.queryListById(userId);
+                for (GykqEntity entity : gykqEntities){
+                    entity.setSysUserEntity(user);
+                }
+                list.addAll(gykqEntities);
+            }
         }
         return list;
     }

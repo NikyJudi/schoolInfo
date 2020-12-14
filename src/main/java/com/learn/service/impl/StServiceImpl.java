@@ -74,8 +74,7 @@ public class StServiceImpl implements StService {
                     entity.setSysUserEntity(user);
                 }
                 list.addAll(stEntities);
-            }
-
+              }
             }
         return list;
     }

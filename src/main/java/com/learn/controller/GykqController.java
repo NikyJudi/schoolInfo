@@ -55,8 +55,8 @@ public class GykqController extends AbstractController {
             query.put("sysUser", userEntity.getUserId());
         }
         List<GykqEntity> gykqList = gykqService.queryList(query);
-        int total = gykqService.queryTotal(query);
-
+//        int total = gykqService.queryTotal(query);
+        int total = gykqList.size();
         PageUtils pageUtil = new PageUtils(gykqList, total, query.getLimit(), query.getPage());
 
         return R.ok().put("page", pageUtil);

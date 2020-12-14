@@ -39,14 +39,18 @@
     <select id="queryObject" resultType="com.learn.entity.GykqEntity">
 		select * from gykq where id = #{value}
 	</select>
-
+    <select id="queryListById" resultType="com.learn.entity.GykqEntity">
+        select * from gykq
+        where
+        <if test="userId != null and userId !=''" >
+            sys_user = #{userId}
+        </if>
+    </select>
     <select id="queryList" resultType="com.learn.entity.GykqEntity">
         select * from gykq where 1=1
         <if test="sysUser != null and sysUser != ''">
             and sys_user = #{sysUser}
         </if>
-
-
         <choose>
             <when test="sidx != null and sidx.trim() != ''">
                 order by ${sidx} ${order}
