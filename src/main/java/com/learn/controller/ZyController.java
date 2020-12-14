@@ -38,7 +38,7 @@ public class ZyController extends AbstractController {
 
 												
 
-		//查询列表数据D
+		//查询列表数据
         Query query = new Query(params);
 
 		List<ZyEntity> zyList = zyService.queryList(query);
