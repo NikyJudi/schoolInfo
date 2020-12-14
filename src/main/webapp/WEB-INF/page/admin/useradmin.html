@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>管理员列表</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="grid-btn">
+			<div class="form-group col-sm-2">
+				<input type="text" class="form-control" v-model="q.username" @keyup.enter="query" placeholder="用户名">
+			</div>
+			<a class="btn btn-default" @click="query">查询</a>
+			#if($shiro.hasPermission("sys:user:save"))
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			#if($shiro.hasPermission("sys:user:update"))
+			<a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+			#end
+			#if($shiro.hasPermission("sys:user:delete"))
+			<a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+			#end
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-success">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+			<div class="form-group">
+			   	<div class="col-sm-2 control-label">用户名</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="user.username" placeholder="登录账号/姓名（可为中文）"/>
+			    </div>
+			</div>
+			<div class="form-group">
+			   	<div class="col-sm-2 control-label">密码</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="user.password" placeholder="密码"/>
+			    </div>
+			</div>
+			<div class="form-group">
+			   	<div class="col-sm-2 control-label">邮箱</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="user.email" placeholder="邮箱"/>
+			    </div>
+			</div>
+			<div class="form-group">
+			   	<div class="col-sm-2 control-label">手机号</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="user.mobile" placeholder="手机号"/>
+			    </div>
+			</div>
+			<div class="form-group">
+<!--				学生、超级管理员；图书管理员、食堂管理员、校医管理员、教师、公寓管理员-->
+				<div class="col-sm-2 control-label">类型</div>
+				<label class="radio-inline">
+				  <input type="radio" name="status" value="3" v-model="user.type"/> 图书管理员
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="status" value="4" v-model="user.type"/> 食堂管理员
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="status" value="5" v-model="user.type"/> 校医管理员
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="status" value="6" v-model="user.type"/> 教师
+				</label>
+				<label class="radio-inline">
+					<input type="radio" name="status" value="7" v-model="user.type"/> 公寓管理员
+				</label>
+			</div>
+			<!--  
+			<div class="form-group">
+				<div class="col-sm-2 control-label">学号</div>
+				<div class="col-sm-10">
+					<input type="text" class="form-control"   v-model="user.xh" placeholder="学号"/>
+				</div>
+			</div>
+			-->
+			<div class="form-group">
+				<div class="col-sm-2 control-label">性别</div>
+				<div class="col-sm-10">
+					<select class="form-control"   v-model="user.xb">
+						<option value="男">男</option>
+						<option value="女">女</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-2 control-label"></div> 
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+				&nbsp;&nbsp;<input type="button" class="btn btn-default" @click="reload" value="返回"/>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/admin/useradmin.js?_${date.systemTime}"></script>
+</body>
+</html>

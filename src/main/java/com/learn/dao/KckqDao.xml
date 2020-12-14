@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.learn.dao.KckqDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.learn.entity.KckqEntity" id="kckqMap">
+        <result property="id" column="id"/>
+        <result property="sysUser" column="sys_user"/>
+        <result property="kc" column="kc"/>
+        <result property="user" column="user"/>
+        <result property="skdd" column="skdd"/>
+        <result property="time" column="time"/>
+        <result property="kqjg" column="kqjg"/>
+    </resultMap>
+	<select id="tjlist" resultType="map">
+		SELECT kqjg,COUNT(*) num from kckq
+		<where>
+			<if test="kc != null and kc !='' and kc !='null'">
+				and kc = #{kc}
+			</if>
+		</where>
+		GROUP BY kqjg
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="tjtotal" resultType="int">
+SELECT COUNT(*) FROM (
+		SELECT kqjg,COUNT(*) num from kckq
+		<where>
+			<if test="kc != null and kc !='' and kc !='null'">
+				and kc = #{kc}
+			</if>
+		</where>
+		GROUP BY kqjg
+)b
+	</select>
+	<select id="queryObject" resultType="com.learn.entity.KckqEntity">
+		select * from kckq where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.learn.entity.KckqEntity">
+		select * from kckq where 1=1
+		<if test="sysUser != null and sysUser != ''">
+			and sys_user = #{sysUser}
+		</if>
+
+																				                <if test="user != null and user != ''">
+                    and user = #{user}
+                </if>
+
+
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<select id="queryListById" resultType="com.learn.entity.KckqEntity">
+		select * from kckq
+		where
+		<if test="userId != null and userId !=''" >
+			sys_user = #{userId}
+		</if>
+	</select>
+
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from kckq  where 1=1
+		<if test="sysUser != null and sysUser != ''">
+			and sys_user = #{sysUser}
+		</if>
+																				                <if test="user != null and user != ''">
+                    and user = #{user}
+                </if>
+																					</select>
+
+	<insert id="save" parameterType="com.learn.entity.KckqEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into kckq
+		(
+			`sys_user`,
+			`kc`,
+			`user`,
+			`skdd`,
+			`time`,
+			`kqjg`
+		)
+		values
+		(
+			#{sysUser},
+			#{kc},
+			#{user},
+			#{skdd},
+			#{time},
+			#{kqjg}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.learn.entity.KckqEntity">
+		update kckq
+		<set>
+			<if test="sysUser != null">`sys_user` = #{sysUser}, </if>
+			<if test="kc != null">`kc` = #{kc}, </if>
+			<if test="user != null">`user` = #{user}, </if>
+			<if test="skdd != null">`skdd` = #{skdd}, </if>
+			<if test="time != null">`time` = #{time}, </if>
+			<if test="kqjg != null">`kqjg` = #{kqjg}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<delete id="delete">
+		delete from kckq where id = #{value}
+	</delete>
+
+	<delete id="deleteBatch">
+		delete from kckq where id in
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

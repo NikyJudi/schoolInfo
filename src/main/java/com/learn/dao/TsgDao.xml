@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.learn.dao.TsgDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.learn.entity.TsgEntity" id="tsgMap">
+        <result property="id" column="id"/>
+        <result property="sysUser" column="sys_user"/>
+        <result property="name" column="name"/>
+        <result property="time" column="time"/>
+        <result property="ghtime" column="ghtime"/>
+    </resultMap>
+	<select id="total" resultType="int">
+		select count(DISTINCT sys_user) from tsg
+	</select>
+	<select id="tjlist" resultType="map">
+		SELECT u.username,COUNT(*) num
+		FROM tsg  t
+		LEFT JOIN sys_user u ON t.sys_user = u.user_id
+		GROUP BY t.sys_user
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<select id="tjtotal" resultType="int">
+		select count(*) from(
+			SELECT u.username,COUNT(*) num
+			FROM tsg  t
+			LEFT JOIN sys_user u ON t.sys_user = u.user_id
+			GROUP BY t.sys_user
+		)a
+	</select>
+
+	<select id="queryObject" resultType="com.learn.entity.TsgEntity">
+		select * from tsg where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.learn.entity.TsgEntity">
+		select * from tsg where 1=1
+		<if test="sysUser != null and sysUser != '' ">
+			and sys_user = #{sysUser}
+		</if>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<select id="queryListById" resultType="com.learn.entity.TsgEntity">
+		select * from tsg
+		where
+		<if test="userId != null and userId !=''" >
+			sys_user = #{userId}
+		</if>
+	</select>
+
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from tsg  where 1=1
+		<if test="sysUser != null and sysUser != ''">
+			and sys_user = #{sysUser}
+		</if>
+																												</select>
+
+
+	<insert id="save" parameterType="com.learn.entity.TsgEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into tsg
+		(
+			`sys_user`,
+			`name`,
+			`time`,
+			`ghtime`
+		)
+		values
+		(
+			#{sysUser},
+			#{name},
+			#{time},
+			#{ghtime}
+		)
+	</insert>
+
+	<update id="update" parameterType="com.learn.entity.TsgEntity">
+		update tsg
+		<set>
+			<if test="sysUser != null">`sys_user` = #{sysUser}, </if>
+			<if test="name != null">`name` = #{name}, </if>
+			<if test="time != null">`time` = #{time}, </if>
+			<if test="ghtime != null">`ghtime` = #{ghtime}</if>
+		</set>
+		where id = #{id}
+	</update>
+
+	<delete id="delete">
+		delete from tsg where id = #{value}
+	</delete>
+
+	<delete id="deleteBatch">
+		delete from tsg where id in
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

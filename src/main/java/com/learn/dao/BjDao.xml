@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 这是MyBatis框架SQL语句的映射配置文件，这里是对名为com.learn.dao.BjDao的映射 -->
+<mapper namespace="com.learn.dao.BjDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+	<!-- resultMap标签用于从数据库的结果集取出的数据映射到相应的实体对象的相应字段中 -->
+    <resultMap type="com.learn.entity.BjEntity" id="bjMap">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+    </resultMap>
+
+	<!-- 映射查询语句，这里id的queryObject与BaseDao.java中的模板方法对应返回的是BjEntity -->
+	<!-- 根据班级（bj）的id查询，BjEntity（id，name） -->
+	<select id="queryObject" resultType="com.learn.entity.BjEntity">
+		select * from bj where id = #{value}
+	</select>
+
+	<!-- 如果用户没有选择name姓名，那就查询所有的班级信息（id，name），传入的参数name不为空时执行下面的语句 -->
+	<select id="queryList" resultType="com.learn.entity.BjEntity">
+		select * from bj where 1=1
+		<if test="name != null and name != ''">
+			and name like '%${name}%'
+		</if>
+
+												
+		<!-- desc是降序排序，sidx代表排序的列名 -->
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<!-- 查询班级的数量 -->
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from bj  where 1=1
+        <if test="name != null and name != ''">
+            and name like '%${name}%'
+        </if>
+													</select>
+	 
+	 <!-- 插入name（班级名），输入参数是BjEntity实体类 -->
+	<insert id="save" parameterType="com.learn.entity.BjEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into bj
+		(
+			`name`
+		)
+		values
+		(
+			#{name}
+		)
+	</insert>
+	 
+	 <!-- 更新bj班级表，如果有输入参数，即将班级表中某个id的name改成新name -->
+	<update id="update" parameterType="com.learn.entity.BjEntity">
+		update bj 
+		<set>
+			<if test="name != null">`name` = #{name}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<!-- 删除id为某个值的那一行 -->
+	<delete id="delete">
+		delete from bj where id = #{value}
+	</delete>
+	
+	<!-- 批量删除，在集合中的id都进行批量删除 -->
+	<!-- collection:指定输入对象中集合属性;
+	item：每次遍历生成的对象
+	open:开始遍历时拼接的串
+	close:结束遍历时两个对象需要拼接的串 -->
+	
+	<delete id="deleteBatch">
+		delete from bj where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

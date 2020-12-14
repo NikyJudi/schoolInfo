@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.learn.dao.GykqDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.learn.entity.GykqEntity" id="gykqMap">
+        <result property="id" column="id"/>
+        <result property="sysUser" column="sys_user"/>
+        <result property="time" column="time"/>
+        <result property="zt" column="zt"/>
+    </resultMap>
+    <select id="tjlist" resultType="map">
+        SELECT a.date,a.zt,COUNT(DISTINCT sys_user) num FROM (
+        SELECT sys_user,DATE_FORMAT(time,'%Y-%m-%d') date,zt FROM gykq
+        <where>
+            <if test="date != null and date !=''">
+                and DATE_FORMAT(time,'%Y-%m-%d') = DATE_FORMAT(#{date},'%Y-%m-%d')
+            </if>
+        </where>
+        )a GROUP BY a.zt
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="tjtotal" resultType="int">
+        SELECT COUNT(*) FROM (
+        SELECT a.date,a.zt,COUNT(DISTINCT sys_user) num FROM (
+        SELECT sys_user,DATE_FORMAT(time,'%Y-%m-%d') date,zt FROM gykq
+        <where>
+            <if test="date != null and date !=''">
+                and DATE_FORMAT(time,'%Y-%m-%d') = DATE_FORMAT(#{date},'%Y-%m-%d')
+            </if>
+        </where>
+        )a GROUP BY a.zt
+        )b
+    </select>
+    <select id="queryObject" resultType="com.learn.entity.GykqEntity">
+		select * from gykq where id = #{value}
+	</select>
+
+    <select id="queryList" resultType="com.learn.entity.GykqEntity">
+        select * from gykq where 1=1
+        <if test="sysUser != null and sysUser != ''">
+            and sys_user = #{sysUser}
+        </if>
+
+
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+            <otherwise>
+                order by id desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="queryTotal" resultType="int">
+        select count(*) from gykq where 1=1
+        <if test="sysUser != null and sysUser != ''">
+            and sys_user = #{sysUser}
+        </if>
+    </select>
+
+    <insert id="save" parameterType="com.learn.entity.GykqEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into gykq
+		(
+			`sys_user`,
+			`time`,
+			`zt`
+		)
+		values
+		(
+			#{sysUser},
+			#{time},
+			#{zt}
+		)
+	</insert>
+
+    <update id="update" parameterType="com.learn.entity.GykqEntity">
+        update gykq
+        <set>
+            <if test="sysUser != null">`sys_user` = #{sysUser},</if>
+            <if test="time != null">`time` = #{time},</if>
+            <if test="zt != null">`zt` = #{zt}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="delete">
+		delete from gykq where id = #{value}
+	</delete>
+
+    <delete id="deleteBatch">
+        delete from gykq where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

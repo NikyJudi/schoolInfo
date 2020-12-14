@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>食堂刷卡记录</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="grid-btn">
+            <a class="btn btn-default" @click="query">查询</a>
+		</div>
+        <div>
+            总人数：{{total}}
+        </div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+
+
+</div>
+
+<script src="${rc.contextPath}/js/admin/yytj.js?_${date.systemTime}"></script>
+</body>
+</html>
